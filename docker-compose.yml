@@ -1,0 +1,33 @@
+# docker-compose.yml
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: dog_api_db
+      POSTGRES_USER: dog_user
+      POSTGRES_PASSWORD: dog_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DEBUG=1
+      - DATABASE_NAME=dog_api_db
+      - DATABASE_USER=dog_user
+      - DATABASE_PASSWORD=dog_password
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+
+volumes:
+  postgres_data:
